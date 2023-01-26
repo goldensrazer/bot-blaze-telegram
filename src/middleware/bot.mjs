@@ -347,7 +347,7 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
 
 BotBlazeWithTelegram.prototype.invokeResult = async function(data){
     let { color } = data;
-    console.log(data)
+    await this.telegram.send('message', process.env.ID_GROUP_MESSAGE);
     if(typeof color !== "undefined" && this.bet.color !== null){
         if(color === this.bet.color || color === 0){
             let sticker = this._getStickerOfOptions(color === 0 ? "white" : this.bet.phase),
