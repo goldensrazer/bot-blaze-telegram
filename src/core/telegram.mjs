@@ -19,9 +19,9 @@ const __filename = fileURLToPath(import.meta.url),
  * 
  * @class
  * @classdesc
- * @author Elizandro Dantas
+ * @author Kel R.C
  * 
- * @see GitHub {@link https://github.com/elizandrodantas}
+ * @see GitHub {@link https://github.com/goldensrazer}
  */
 
 export function Telegram(){
@@ -39,9 +39,9 @@ export function Telegram(){
 
     this.messageInfoBot = [
         "🤖 <b>Bot Info:</b> \n",
-        `<b>Author:</b> Elizandro Dantas`,
-        `<b>Telegram:</b> <a href="tg://user?id=1321348593">@elizandrodantas</a>`,
-        `<b>Instagram:</b> <a href="https://www.instagram.com/elizandrodantas/">@elizandrodantas</a>`,
+        `<b>Author:</b> Kel R.C`,
+        `<b>Telegram:</b> <a href="tg://user?id=1321348593">@goldensrazer</a>`,
+        `<b>Instagram:</b> <a href="https://www.instagram.com/goldensrazer/">@goldensrazer</a>`,
         "\n",
         "🔭 Aproveite todos meus serviços nos canais."
     ];
@@ -109,7 +109,7 @@ Telegram.prototype.checkChatId = async function(){
             checkStatus.fail("o bot ainda não foi iniciado :(");
             process.exit();
         }
-
+        console.log(process.env.ID_GROUP_MESSAGE)
         let messageCheck = await this.client.telegram.sendMessage(process.env.ID_GROUP_MESSAGE, 'checked group with chat_id');
         this.client.telegram.deleteMessage(process.env.ID_GROUP_MESSAGE, messageCheck.message_id);
 
@@ -258,6 +258,9 @@ Telegram.prototype.sendIn = async function(color, clientId, protection = false, 
     if(typeof protection === "number")
         message.push(`PROTEJA NO ${this._getColorNameOrEmoticon(protection, true)} ${this._getColorNameOrEmoticon(protection, false, true)}`);
     message.push(`\n<pre>https://blaze.com/</pre>`);
+    message.push(`\n\nLink para pré-analise abaixo!`);
+    message.push(`\n<pre>https://goldensrazer.github.io/Blaze_Double_history</pre>`)
+    message.push(`\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`);
 
     return await this.send(message.join('\n'), clientId, { parse_mode: "HTML" } );
 }

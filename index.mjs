@@ -4,12 +4,12 @@ import ora from 'ora';
 import gradient from 'gradient-string';
 import figlet from 'figlet';
 
-import { BotBlazeWithTelegram } from '../src/index.mjs'
-import { _getColorNameOrEmoticon } from '../src/util/blaze.mjs';
+import { BotBlazeWithTelegram } from './src/index.mjs'
+import { _getColorNameOrEmoticon } from './src/util/blaze.mjs';
 
 figlet('Blaze with Telegram', (_, screen) => {
     console.log(gradient.vice(screen));
-    console.log('       ' + gradient.cristal('by: Elizandro Dantas'));
+    console.log('       ' + gradient.cristal('by: Kel R.C'));
     console.log();
     start();
 });
@@ -47,12 +47,18 @@ async function start(){
                 return "🔎 <b>SINAL ENCONTRADO:</b>\n" +
                     `\nENTRE NO ${_getColorNameOrEmoticon(current.color, { emoticon: true })} ${_getColorNameOrEmoticon(current.color, { pt: true, upper: true })}` +
                     `\nPROTEJA NO ${_getColorNameOrEmoticon(0, { emoticon: true })} ${_getColorNameOrEmoticon(0, { pt: true, upper: true })}` +
-                    `\n\n<pre>https://blaze.com/</pre>`;
+                    `\n\n<pre>https://blaze.com/</pre>` + 
+                    `\n\nLink para pré-analise abaixo!` +
+                    `\n<pre>https://goldensrazer.github.io/Blaze_Double_history</pre>` +
+                    `\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`;
             },
-            gale: 1
+            gale: 1,
+            IOptionsSummaryOfResult: true
          })
 
     await controllerBot.run();
+    
+    controllerBot.resetWin({time_reset_win_in_mili_seconds: Number(process.env.TIME_RESET_WIN_IN_MILI_SECONDS)});
 
     appOra.succeed('Iniciado com sucesso!');
 

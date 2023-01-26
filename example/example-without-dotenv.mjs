@@ -7,7 +7,7 @@ import { _getColorNameOrEmoticon } from '../src/util/blaze.mjs';
 
 figlet('Blaze with Telegram', (_, screen) => {
     console.log(gradient.vice(screen));
-    console.log('       ' + gradient.cristal('by: Elizandro Dantas'));
+    console.log('       ' + gradient.cristal('by: Kel R.C'));
     console.log();
     start();
 });

@@ -43,7 +43,7 @@ import { createHash, createHmac } from 'node:crypto';
  * @author Elizandro Dantas 
  * 
  * @see Blaze {@link https://blaze.com/pt/}
- * @see GitHub {@link https://github.com/elizandrodantas}
+ * @see GitHub {@link https://github.com/goldensrazer}
  */
 
 export function BlazeCore(){

@@ -4,7 +4,10 @@ import { setVariable, isNumber, isString, random, isFunction, _getColorNameOrEmo
 import { StaticMessageEnterBet, StaticMessageGale, StaticMessageWinAndLoss } from '../static/index.mjs';
 import { Messages } from '../structure/index.mjs';
 import staticQuestion from '../static/question.mjs';
+import path from 'path';
+import dotenv from 'dotenv';
 
+dotenv.config({ path: path.resolve(path.resolve(), '../.env') });
 
 /**
  * opções de uso do bot
@@ -149,10 +152,10 @@ import staticQuestion from '../static/question.mjs';
 /**
  * @class
  * @classdesc
- * @author Elizandro Dantas
+ * @author Kel R.C
  * @param {IConstructorClassDad} options
  * 
- * @see GitHub {@link https://github.com/elizandrodantas}
+ * @see GitHub {@link https://github.com/goldensrazer}
  */
 
 export function BotBlazeWithTelegram(options){
@@ -183,7 +186,7 @@ export function BotBlazeWithTelegram(options){
             }
         }
     }
-
+    
     /** @api private */
     this.telegram = new Telegram();
 
@@ -674,4 +677,10 @@ BotBlazeWithTelegram.prototype._gale = function(options){
             this.gale.phase = "off";
         }
     }
+}
+
+BotBlazeWithTelegram.prototype.resetWin = function (options) {
+    setInterval(() => {
+        this.summaryPlays.number.win = 0;
+    }, options.time_reset_win_in_mili_seconds)
 }

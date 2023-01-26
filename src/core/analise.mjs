@@ -30,9 +30,9 @@ import { getColorWithRoll, getRollRandomWithColor, transformStringToNumberColor 
  * 
  * @class
  * @classdesc
- * @author Elizandro Dantas
+ * @author Kel R.C
  * 
- * @see GitHub {@link https://github.com/elizandrodantas}
+ * @see GitHub {@link https://github.com/goldensrazer}
  */
 
 export class Analise {
