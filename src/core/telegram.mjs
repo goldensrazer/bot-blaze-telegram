@@ -24,18 +24,18 @@ const __filename = fileURLToPath(import.meta.url),
  * @see GitHub {@link https://github.com/goldensrazer}
  */
 
-export function Telegram(){
-    if(!process.env.BOT_TOKEN)
+export function Telegram() {
+    if (!process.env.BOT_TOKEN)
         throw new EnvironmentVariablesError("BOT_TOKEN");
 
-    if(process.env.BOT_TOKEN.split(':').length !== 2)
+    if (process.env.BOT_TOKEN.split(':').length !== 2)
         throw new EnvironmentVariablesError("BOT_TOKEN INVALID");
 
 
     /** @type {"pause" | "on"} */
     this.status = "pause";
     /** @type {Telegraf} */
-    this.client = new Telegraf(process.env.BOT_TOKEN, {  });
+    this.client = new Telegraf(process.env.BOT_TOKEN, {});
 
     this.messageInfoBot = [
         "🤖 <b>Bot Info:</b> \n",
@@ -58,26 +58,26 @@ export function Telegram(){
  * @api public
  */
 
-Telegram.prototype.start = async function(){
+Telegram.prototype.start = async function () {
     var startingOra = ora('iniciando bot').start();
-    try{
-        
+    try {
+
         this.bot_info = await this.client.telegram.getMe();
         this.client.launch({ dropPendingUpdates: true });
         this.status = "on";
-        
+
         startingOra.succeed("bot iniciado com sucesso :)");
 
         this.client.use(async (ctx, next) => {
             let { type, id } = await ctx.getChat();
 
-            if(type === "private"){
+            if (type === "private") {
                 await ctx.deleteMessage();
                 await ctx.telegram.sendMessage(id, `⚠️ Não é possivel enviar mensagem privada`);
                 await ctx.telegram.sendMessage(id, this.messageInfoBot.join('\n'), { parse_mode: "HTML" });
-                return ;
+                return;
             }
-            
+
             return next();
         });
 
@@ -85,7 +85,7 @@ Telegram.prototype.start = async function(){
 
         process.once("SIGINT", () => this.client.stop("SIGINT"));
         process.once("SIGTERM", () => this.client.stop("SIGTERM"));
-    }catch(err){
+    } catch (err) {
         startingOra.fail("não foi possivel iniciar o bot, verifique se o token esta correto e tente novamente :(");
         process.exit();
     }
@@ -101,20 +101,19 @@ Telegram.prototype.start = async function(){
  * @api public
  */
 
-Telegram.prototype.checkChatId = async function(){
+Telegram.prototype.checkChatId = async function () {
     const checkStatus = ora('verificando chat_id').start();
-    try{
-        if(this.status !== "on"){
+    try {
+        if (this.status !== "on") {
             checkStatus.fail("o bot ainda não foi iniciado :(");
             process.exit();
         }
-        
-        console.log('message')
-        let messageCheck = await this.client.telegram.sendMessage(process.env.ID_GROUP_MESSAGE, 'checked group with chat_id');
+
+        await this.client.telegram.sendMessage(process.env.ID_GROUP_MESSAGE, 'checked group with chat_id');
         // this.client.telegram.deleteMessage(process.env.ID_GROUP_MESSAGE, messageCheck.message_id);
 
         checkStatus.succeed('tudo certo com o chat_id :)');
-    }catch(err){
+    } catch (err) {
         console.log(err.message)
         checkStatus.fail('chat id invalido ou o bot não tem permisão para enviar mensagem :(');
         process.exit();
@@ -147,31 +146,35 @@ Telegram.prototype.checkChatId = async function(){
  * @see Core Telegram {@link https://core.telegram.org/bots/api#sendmessage}
  */
 
-Telegram.prototype.send = async function(message, clientId, options = { parse_mode: "HTML" }){
-    const check_message = ora('verificando mensagem').start();
-    if(this.status !== "on")
-        return { status: "error", message: "bot ainda não foi startado!" }
+Telegram.prototype.send = async function (message, clientId, options = { parse_mode: "HTML" }) {
+    try {
+        const check_message = ora('verificando mensagem').start();
+        if (this.status !== "on")
+            return { status: "error", message: "bot ainda não foi startado!" }
 
-    if(!message || !clientId)
-        return { status: "error", message: "mensagem e id do chat são argumentos obrigatorios" }
+        if (!message || !clientId)
+            return { status: "error", message: "mensagem e id do chat são argumentos obrigatorios" }
 
-    try{
-        if(typeof clientId === "object" && Array.isArray(clientId)){
-            for (let index = 0; index < clientId.length; index++) {
-                check_message.succeed(`[${new Date().toLocaleString()}] - [info] object message to sended ${clientId[index]}, message=${message} options=${JSON.stringify(options)}`);
-                await this.client.telegram.sendMessage(clientId[index], message, options);
+        try {
+            if (typeof clientId === "object" && Array.isArray(clientId)) {
+                for (let index = 0; index < clientId.length; index++) {
+                    check_message.succeed(`[${new Date().toLocaleString()}] - [info] object message to sended ${clientId[index]}, message=${message} options=${JSON.stringify(options)}`);
+                    await this.client.telegram.sendMessage(clientId[index], message, options);
+                }
+            } else if (typeof clientId === "string") {
+                check_message.succeed(`[${new Date().toLocaleString()}] - [info] string message to sended ${clientId}, message=${message} options=${JSON.stringify(options)}`);
+                await this.client.telegram.sendMessage(clientId, message, options);
+            } else {
+                return { status: "error", message: "chat id deve ser uma string ou um array de string" }
             }
-        }else if(typeof clientId === "string"){
-            check_message.succeed(`[${new Date().toLocaleString()}] - [info] string message to sended ${clientId}, message=${message} options=${JSON.stringify(options)}`);
-            await this.client.telegram.sendMessage(clientId, message, options);
-        }else{
-            return { status: "error", message: "chat id deve ser uma string ou um array de string" }
+        } catch (err) {
+            check_message.fail(`[error] erro on send message error=${err.message}`);
+            return { status: "error", message: "erro ao enviar mensagem" }
         }
-    }catch(err){
-        check_message.fail(`[error] erro on send message error=${err.message}`);
-        return { status: "error", message: "erro ao enviar mensagem" }
+        return { status: "success", message: "mensagem enviada com sucesso" }
+    } catch (error) {
+        console.log(error)
     }
-    return { status: "success", message: "mensagem enviada com sucesso" }
 }
 
 /**
@@ -200,36 +203,40 @@ Telegram.prototype.send = async function(message, clientId, options = { parse_mo
  * @see Core Telegram {@link https://core.telegram.org/bots/api#sendsticker}
  */
 
-Telegram.prototype.sendSticker = async function(sticker, clientId){
-    if(this.status !== "on")
-        return { status: "error", message: "bot ainda não foi startado!" }
+Telegram.prototype.sendSticker = async function (sticker, clientId) {
+    try {
+        if (this.status !== "on")
+            return { status: "error", message: "bot ainda não foi startado!" }
 
-    if(!sticker || !clientId)
-        return { status: "error", message: "sticker e id do chat são argumentos obrigatorios" }
+        if (!sticker || !clientId)
+            return { status: "error", message: "sticker e id do chat são argumentos obrigatorios" }
 
-    let file = resolve(__dirname, '../', '../', 'sticker', sticker)
-    
-    try{
-        readFileSync(file);
-    }catch(err){
-        return { status: "error", message: "sticker não existe" }
-    }
-    
-    try{
-        if(typeof clientId === "object" && Array.isArray(clientId)){
-            for (let index = 0; index < clientId.length; index++) {
-                await this.client.telegram.sendSticker(clientId[index], { source: readFileSync(file) });
-            }
-        }else if(typeof clientId === "string"){
-            await this.client.telegram.sendSticker(clientId, { source: readFileSync(file) });
-        }else{
-            return { status: "error", message: "chat id deve ser uma string ou um array de string" } 
+        let file = resolve(__dirname, '../', '../', 'sticker', sticker)
+
+        try {
+            readFileSync(file);
+        } catch (err) {
+            return { status: "error", message: "sticker não existe" }
         }
-    }catch(err){
-        return { status: "error", message: "erro ao enviar sticker" }
-    }
 
-    return { status: "success", message: "sticket enviado com sucesso" }
+        try {
+            if (typeof clientId === "object" && Array.isArray(clientId)) {
+                for (let index = 0; index < clientId.length; index++) {
+                    await this.client.telegram.sendSticker(clientId[index], { source: readFileSync(file) });
+                }
+            } else if (typeof clientId === "string") {
+                await this.client.telegram.sendSticker(clientId, { source: readFileSync(file) });
+            } else {
+                return { status: "error", message: "chat id deve ser uma string ou um array de string" }
+            }
+        } catch (err) {
+            return { status: "error", message: "erro ao enviar sticker" }
+        }
+
+        return { status: "success", message: "sticket enviado com sucesso" }
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 /**
@@ -247,26 +254,30 @@ Telegram.prototype.sendSticker = async function(sticker, clientId){
  * @deprecated campo descontinuado (>v0.1.20)
  */
 
-Telegram.prototype.sendIn = async function(color, clientId, protection = false, gale = false){
-    if(!color || !clientId)
-        return { status: "error", message: "cor e id do chat são argumentos obrigatorios" }
+Telegram.prototype.sendIn = async function (color, clientId, protection = false, gale = false) {
+    try {
+        if (!color || !clientId)
+            return { status: "error", message: "cor e id do chat são argumentos obrigatorios" }
 
-    let message = [];
+        let message = [];
 
-    if(gale)
-        message.push(`⚠️ <b>ENTROU PRA ${gale}:</b>\n`);
-    else
-        message.push(`🔎 <b>SINAL ENCONTRADO:</b>\n`);
+        if (gale)
+            message.push(`⚠️ <b>ENTROU PRA ${gale}:</b>\n`);
+        else
+            message.push(`🔎 <b>SINAL ENCONTRADO:</b>\n`);
 
-    message.push(`ENTRE NO ${this._getColorNameOrEmoticon(color, true)} ${this._getColorNameOrEmoticon(color, false, true)}`);
-    if(typeof protection === "number")
-        message.push(`PROTEJA NO ${this._getColorNameOrEmoticon(protection, true)} ${this._getColorNameOrEmoticon(protection, false, true)}`);
-    message.push(`\n<pre>https://blaze.com/</pre>`);
-    message.push(`\n\nLink para pré-analise abaixo!`);
-    message.push(`\n<a href="https://goldensrazer.github.io/Blaze_Double_history">Pagina de pré-analise</a>`)
-    message.push(`\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`);
+        message.push(`ENTRE NO ${this._getColorNameOrEmoticon(color, true)} ${this._getColorNameOrEmoticon(color, false, true)}`);
+        if (typeof protection === "number")
+            message.push(`PROTEJA NO ${this._getColorNameOrEmoticon(protection, true)} ${this._getColorNameOrEmoticon(protection, false, true)}`);
+        message.push(`\n<pre>https://blaze.com/</pre>`);
+        message.push(`\n\nLink para pré-analise abaixo!`);
+        message.push(`\n<a href="https://goldensrazer.github.io/Blaze_Double_history">Pagina de pré-analise</a>`)
+        message.push(`\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`);
 
-    return await this.send(message.join('\n'), clientId, { parse_mode: "HTML" } );
+        return await this.send(message.join('\n'), clientId, { parse_mode: "HTML" });
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 /**
@@ -286,25 +297,29 @@ Telegram.prototype.sendIn = async function(color, clientId, protection = false, 
  * @api public
  */
 
-Telegram.prototype.sendResult = async function(result, clientId, infoBet = false, sticker = false){
-    if(!["green", "white", "gale", "loss"].includes(result))
-        return { status: "error", message: "tipo do resultado invalido" }
-    
-    if(typeof infoBet === "object" &&
-        ("colorBet" in infoBet && "colorLast" in infoBet)){
+Telegram.prototype.sendResult = async function (result, clientId, infoBet = false, sticker = false) {
+    try {
+        if (!["green", "white", "gale", "loss"].includes(result))
+            return { status: "error", message: "tipo do resultado invalido" }
 
-        let message = [];
+        if (typeof infoBet === "object" &&
+            ("colorBet" in infoBet && "colorLast" in infoBet)) {
 
-        message.push('🔸 ENTRAMOS NO ' + this._getColorNameOrEmoticon(infoBet.colorBet, true));
-        message.push('🔹 RESULTADO FOI ' + this._getColorNameOrEmoticon(infoBet.colorLast, true));
+            let message = [];
 
-        await this.send(message.join('\n'), clientId, { parse_mode: "HTML" });
+            message.push('🔸 ENTRAMOS NO ' + this._getColorNameOrEmoticon(infoBet.colorBet, true));
+            message.push('🔹 RESULTADO FOI ' + this._getColorNameOrEmoticon(infoBet.colorLast, true));
+
+            await this.send(message.join('\n'), clientId, { parse_mode: "HTML" });
+        }
+
+        if (typeof sticker === "string")
+            await this.sendSticker(sticker, clientId);
+
+        return { status: "success", message: "resultado enviado com sucesso" }
+    } catch (error) {
+        console.log(error)
     }
-
-    if(typeof sticker === "string")
-        await this.sendSticker(sticker, clientId);
-
-    return { status: "success", message: "resultado enviado com sucesso" }
 }
 
 /**
@@ -317,7 +332,7 @@ Telegram.prototype.sendResult = async function(result, clientId, infoBet = false
  * @api public
  */
 
-Telegram.prototype.close = function(){
+Telegram.prototype.close = function () {
     this.client.stop();
 
     console.log("telegram closed successful");
@@ -336,10 +351,10 @@ Telegram.prototype.close = function(){
  * @api private
  */
 
-Telegram.prototype._getColorNameOrEmoticon = function(color, emoticon = false, pt = false){
-    if(color === 0) return emoticon ? "⚪️" : pt ? "branco" : "white";
-    if(color === 1) return emoticon ? "🔴" : pt ? "vermelho" : "red";
-    if(color === 2) return emoticon ? "⚫" : pt ? "preto" : "black";
+Telegram.prototype._getColorNameOrEmoticon = function (color, emoticon = false, pt = false) {
+    if (color === 0) return emoticon ? "⚪️" : pt ? "branco" : "white";
+    if (color === 1) return emoticon ? "🔴" : pt ? "vermelho" : "red";
+    if (color === 2) return emoticon ? "⚫" : pt ? "preto" : "black";
 
     return "";
 }
