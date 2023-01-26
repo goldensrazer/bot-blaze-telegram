@@ -132,7 +132,6 @@ BlazeCore.prototype.start = function(){
     });
 
     wss.on('message', (data) => {
-        console.log(data)
         this.onMessage(data, this.ev);
     });
     
