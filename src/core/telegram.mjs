@@ -40,8 +40,6 @@ export function Telegram() {
     this.messageInfoBot = [
         "🤖 <b>Bot Info:</b> \n",
         `<b>Author:</b> Kel R.C`,
-        `<b>Telegram:</b> <a href="tg://user?id=1321348593">@goldensrazer</a>`,
-        `<b>Instagram:</b> <a href="https://www.instagram.com/goldensrazer/">@goldensrazer</a>`,
         "\n",
         "🔭 Aproveite todos meus serviços nos canais."
     ];
@@ -109,7 +107,7 @@ Telegram.prototype.checkChatId = async function () {
             checkStatus.fail("o bot ainda não foi iniciado :(");
             process.exit();
         }
-        console.log(process.env.ID_GROUP_MESSAGE)
+
         let messageCheck = await this.client.telegram.sendMessage(process.env.ID_GROUP_MESSAGE, 'checked group with chat_id');
         this.client.telegram.deleteMessage(process.env.ID_GROUP_MESSAGE, messageCheck.message_id);
 
@@ -204,7 +202,7 @@ Telegram.prototype.sendSticker = async function (sticker, clientId) {
         return { status: "error", message: "sticker e id do chat são argumentos obrigatorios" }
 
     let file = resolve(__dirname, '../', '../', 'sticker', sticker)
-    console.log(file)
+
     try {
         readFileSync(file);
     } catch (err) {
