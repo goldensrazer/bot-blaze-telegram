@@ -176,7 +176,12 @@ BlazeCore.prototype.start = function(){
 
 BlazeCore.prototype.recents = async function(){
     try{
-        let data = await request.get("https://blaze.com/api/roulette_games/recent", { json: true });
+        let data = await request.get("https://blaze.com/api/roulette_games/recent", { 
+            json: true, 
+            headers: {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
+            } 
+        });
 
         return { status: true, error: null, response: data }
     }catch(err){
