@@ -197,40 +197,35 @@ Telegram.prototype.send = async function (message, clientId, options = { parse_m
  */
 
 Telegram.prototype.sendSticker = async function (sticker, clientId) {
+    if (this.status !== "on")
+        return { status: "error", message: "bot ainda não foi startado!" }
+
+    if (!sticker || !clientId)
+        return { status: "error", message: "sticker e id do chat são argumentos obrigatorios" }
+
+    let file = resolve(__dirname, '../', '../', 'sticker', sticker)
+
     try {
-        if (this.status !== "on")
-            return { status: "error", message: "bot ainda não foi startado!" }
-
-        if (!sticker || !clientId)
-            return { status: "error", message: "sticker e id do chat são argumentos obrigatorios" }
-
-        let file = resolve(__dirname, '../', '../', 'sticker', sticker)
-
-        try {
-            readFileSync(file);
-        } catch (err) {
-            return { status: "error", message: "sticker não existe" }
-        }
-
-        try {
-            if (typeof clientId === "object" && Array.isArray(clientId)) {
-                for (let index = 0; index < clientId.length; index++) {
-                    await this.client.telegram.sendSticker(clientId[index], { source: readFileSync(file) });
-                }
-            } else if (typeof clientId === "string") {
-                await this.client.telegram.sendSticker(clientId, { source: readFileSync(file) });
-            } else {
-                return { status: "error", message: "chat id deve ser uma string ou um array de string" }
-            }
-        } catch (err) {
-            return { status: "error", message: "erro ao enviar sticker" }
-        }
-
-        return { status: "success", message: "sticket enviado com sucesso" }
-    } catch (error) {
-        console.log(error)
-        return { status: "success", message: "sticket enviado com sucesso" }
+        readFileSync(file);
+    } catch (err) {
+        return { status: "error", message: "sticker não existe" }
     }
+
+    try {
+        if (typeof clientId === "object" && Array.isArray(clientId)) {
+            for (let index = 0; index < clientId.length; index++) {
+                await this.client.telegram.sendSticker(clientId[index], { source: readFileSync(file) });
+            }
+        } else if (typeof clientId === "string") {
+            await this.client.telegram.sendSticker(clientId, { source: readFileSync(file) });
+        } else {
+            return { status: "error", message: "chat id deve ser uma string ou um array de string" }
+        }
+    } catch (err) {
+        return { status: "error", message: "erro ao enviar sticker" }
+    }
+
+    return { status: "success", message: "sticket enviado com sucesso" }
 }
 
 /**
