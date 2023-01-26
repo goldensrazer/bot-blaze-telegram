@@ -347,12 +347,12 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
 
 BotBlazeWithTelegram.prototype.invokeResult = async function(data){
     let { color } = data;
-
+    console.log(data)
     if(typeof color !== "undefined" && this.bet.color !== null){
         if(color === this.bet.color || color === 0){
             let sticker = this._getStickerOfOptions(color === 0 ? "white" : this.bet.phase),
                 message;
-            console.log(sticker, message)
+
             if(sticker) {
                 await this.telegram.sendSticker(sticker, process.env.ID_GROUP_MESSAGE);
             }
@@ -364,8 +364,6 @@ BotBlazeWithTelegram.prototype.invokeResult = async function(data){
                 message = new Messages(StaticMessageWinAndLoss(data, this.bet));
             }
             
-            console.log(message)
-
             await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
             
             if(this.options.timeAfterWin){
