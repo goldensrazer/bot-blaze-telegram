@@ -14,7 +14,7 @@ figlet('Blaze with Telegram', (_, screen) => {
     start();
 });
 
-async function start(){
+async function start() {
     let appOra = ora('Iniciando aplicação').start(),
         controllerBot = new BotBlazeWithTelegram({
             timeAfterWin: {
@@ -43,22 +43,24 @@ async function start(){
             },
             messageEnterBet: (current, recents, cb) => {
                 // cb('test callback');
-        
+
                 return "🔎 <b>SINAL ENCONTRADO:</b>\n" +
                     `\nENTRE NO ${_getColorNameOrEmoticon(current.color, { emoticon: true })} ${_getColorNameOrEmoticon(current.color, { pt: true, upper: true })}` +
                     `\nPROTEJA NO ${_getColorNameOrEmoticon(0, { emoticon: true })} ${_getColorNameOrEmoticon(0, { pt: true, upper: true })}` +
-                    `\n\n<pre>https://blaze.com/</pre>` + 
+                    `\n\n<pre>https://blaze.com/</pre>` +
                     `\n\nLink para pré-analise abaixo!` +
                     `\n<a href="https://goldensrazer.github.io/Blaze_Double_history">Pagina de pré-analise</a>` +
                     `\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`;
             },
             gale: 1,
             IOptionsSummaryOfResult: true
-         })
+        })
 
     await controllerBot.run();
-    
-    controllerBot.resetWin({time_reset_win_in_mili_seconds: Number(process.env.TIME_RESET_WIN_IN_MILI_SECONDS)});
+
+    controllerBot.resetWin({
+        time_reset_win_in_mili_seconds: Number(process.env.TIME_RESET_WIN_IN_MILI_SECONDS)
+    });
 
     appOra.succeed('Iniciado com sucesso!');
 
