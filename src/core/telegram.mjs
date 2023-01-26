@@ -109,8 +109,9 @@ Telegram.prototype.checkChatId = async function(){
             process.exit();
         }
         
+        console.log('message')
         let messageCheck = await this.client.telegram.sendMessage(process.env.ID_GROUP_MESSAGE, 'checked group with chat_id');
-        this.client.telegram.deleteMessage(process.env.ID_GROUP_MESSAGE, messageCheck.message_id);
+        // this.client.telegram.deleteMessage(process.env.ID_GROUP_MESSAGE, messageCheck.message_id);
 
         checkStatus.succeed('tudo certo com o chat_id :)');
     }catch(err){
