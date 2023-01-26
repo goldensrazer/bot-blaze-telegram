@@ -204,7 +204,7 @@ Telegram.prototype.sendSticker = async function (sticker, clientId) {
         return { status: "error", message: "sticker e id do chat são argumentos obrigatorios" }
 
     let file = resolve(__dirname, '../', '../', 'sticker', sticker)
-
+    console.log(file)
     try {
         readFileSync(file);
     } catch (err) {
