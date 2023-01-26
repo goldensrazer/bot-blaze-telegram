@@ -40,8 +40,6 @@ export function Telegram(){
     this.messageInfoBot = [
         "🤖 <b>Bot Info:</b> \n",
         `<b>Author:</b> Kel R.C`,
-        `<b>Telegram:</b> <a href="tg://user?id=1321348593">@goldensrazer</a>`,
-        `<b>Instagram:</b> <a href="https://www.instagram.com/goldensrazer/">@goldensrazer</a>`,
         "\n",
         "🔭 Aproveite todos meus serviços nos canais."
     ];
@@ -63,6 +61,7 @@ export function Telegram(){
 Telegram.prototype.start = async function(){
     var startingOra = ora('iniciando bot').start();
     try{
+        
         this.bot_info = await this.client.telegram.getMe();
         this.client.launch({ dropPendingUpdates: true });
         this.status = "on";
@@ -109,12 +108,13 @@ Telegram.prototype.checkChatId = async function(){
             checkStatus.fail("o bot ainda não foi iniciado :(");
             process.exit();
         }
-        console.log(process.env.ID_GROUP_MESSAGE)
+        
         let messageCheck = await this.client.telegram.sendMessage(process.env.ID_GROUP_MESSAGE, 'checked group with chat_id');
         this.client.telegram.deleteMessage(process.env.ID_GROUP_MESSAGE, messageCheck.message_id);
 
         checkStatus.succeed('tudo certo com o chat_id :)');
     }catch(err){
+        console.log(err.message)
         checkStatus.fail('chat id invalido ou o bot não tem permisão para enviar mensagem :(');
         process.exit();
     }
@@ -147,6 +147,7 @@ Telegram.prototype.checkChatId = async function(){
  */
 
 Telegram.prototype.send = async function(message, clientId, options = { parse_mode: "HTML" }){
+    const check_message = ora('verificando mensagem').start();
     if(this.status !== "on")
         return { status: "error", message: "bot ainda não foi startado!" }
 
@@ -156,19 +157,19 @@ Telegram.prototype.send = async function(message, clientId, options = { parse_mo
     try{
         if(typeof clientId === "object" && Array.isArray(clientId)){
             for (let index = 0; index < clientId.length; index++) {
-                console.log('message')
+                check_message.succeed(`[${new Date().toLocaleString()}] - [info] object message to sended ${clientId[index]}, message=${message} options=${JSON.stringify(options)}`);
                 await this.client.telegram.sendMessage(clientId[index], message, options);
             }
         }else if(typeof clientId === "string"){
-            console.log('message2')
+            check_message.succeed(`[${new Date().toLocaleString()}] - [info] string message to sended ${clientId}, message=${message} options=${JSON.stringify(options)}`);
             await this.client.telegram.sendMessage(clientId, message, options);
         }else{
             return { status: "error", message: "chat id deve ser uma string ou um array de string" }
         }
     }catch(err){
+        check_message.fail(`[error] erro on send message error=${err.message}`);
         return { status: "error", message: "erro ao enviar mensagem" }
     }
-
     return { status: "success", message: "mensagem enviada com sucesso" }
 }
 
