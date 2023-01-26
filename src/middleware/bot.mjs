@@ -288,10 +288,11 @@ BotBlazeWithTelegram.prototype.run = async function(){
  */
 
 BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
+    console.log(this.bet.jump)
     if(this.bet.jump) return { status: "jump" }
 
     let { status, response, error } = await this.blaze.recents();
-    
+    console.log(status, response, error)
     if(!status || !response) return { status: "error", message: error }
 
     if(!status){
