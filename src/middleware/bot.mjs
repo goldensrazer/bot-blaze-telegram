@@ -267,14 +267,12 @@ BotBlazeWithTelegram.prototype.run = async function(){
     this.blaze.ev.on("game_graphing", async (data) => {
         data && console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'round performed, result:', `[color: ${chalk.yellow(_getColorNameOrEmoticon(data.color, { pt: true }))} - roll: ${chalk.yellow(data.roll)}]`);
         this._summary({ verifyDate: true });
-        console.log(data)
         data && await this.invokeResult(data);
     });
 
     this.blaze.ev.on('game_complete', async (data) => {
         data && console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'full round');
         this._summary({ verifyDate: true });
-        console.log(data)
         data && await this.invokeAnalyst(data);
     });
 }
@@ -354,14 +352,19 @@ BotBlazeWithTelegram.prototype.invokeResult = async function(data){
         if(color === this.bet.color || color === 0){
             let sticker = this._getStickerOfOptions(color === 0 ? "white" : this.bet.phase),
                 message;
-
-            if(sticker)
+            console.log(sticker, message)
+            if(sticker) {
                 await this.telegram.sendSticker(sticker, process.env.ID_GROUP_MESSAGE);
+            }
 
-            if(isFunction(this.options?.messageWin))
+            if(isFunction(this.options?.messageWin)) {
                 message = new Messages(this.options.messageWin(data, this.bet, this.cb));
-            else
+            } 
+            else {
                 message = new Messages(StaticMessageWinAndLoss(data, this.bet));
+            }
+            
+            console.log(message)
 
             await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
             
@@ -370,8 +373,9 @@ BotBlazeWithTelegram.prototype.invokeResult = async function(data){
                     { message, time } = new Messages()._extractOfOption(timeAfterWin);
 
                 this._timeNextBetSafe(time);
-                if(isString(message))
+                if(isString(message)) {
                     await this.telegram.send(message, process.env.ID_GROUP_MESSAGE);
+                }
             }
 
             this._gale({ sequence: "reset" });
@@ -386,10 +390,12 @@ BotBlazeWithTelegram.prototype.invokeResult = async function(data){
                     return this.invokeResult(data);
                 }
 
-                if(isFunction(this.options?.messageOfGale))
+                if(isFunction(this.options?.messageOfGale)) {
                     message = new Messages(this.options.messageOfGale(data, this.bet, this.gale, this.cb));
-                else
+                }
+                else {
                     message = new Messages(StaticMessageGale(data, this.bet, this.gale));
+                }
                 
                 await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
                 this._gale({ sequence: "add" });
@@ -400,31 +406,37 @@ BotBlazeWithTelegram.prototype.invokeResult = async function(data){
                     return this.invokeResult(data);
                 }
                 
-                if(isFunction(this.options?.messageOfGale))
+                if(isFunction(this.options?.messageOfGale)) {
                     message = new Messages(this.options.messageOfGale(data, this.bet, this.gale, this.cb));
-                else
+                }
+                else {
                     message = new Messages(StaticMessageGale(data, this.bet, this.gale));
+                }
                 
                 await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
                 this._gale({ sequence: "add" });
             }else{
                 let sticker = this._getStickerOfOptions('loss');
 
-                if(sticker)
+                if(sticker) {
                     await this.telegram.sendSticker(sticker, process.env.ID_GROUP_MESSAGE);
+                }
                 
-                if(isFunction(this.options?.messageLoss))
+                if(isFunction(this.options?.messageLoss)) {
                     message = new Messages(this.options.messageLoss(data, this.bet, this.cb));
-                else
+                }
+                else {
                     message = new Messages(StaticMessageWinAndLoss(data, this.bet));
+                }
 
                 if(this.options.timeAfterLoss){
                     let { timeAfterLoss } = this.options,
                         { message, time } = new Messages()._extractOfOption(timeAfterLoss);
     
                     this._timeNextBetSafe(time);
-                    if(isString(message))
+                    if(isString(message)) {
                         await this.telegram.send(message, process.env.ID_GROUP_MESSAGE);
+                    }
                 }
 
                 await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
