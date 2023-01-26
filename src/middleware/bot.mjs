@@ -158,7 +158,7 @@ dotenv.config({ path: path.resolve(path.resolve(), '../.env') });
  * @see GitHub {@link https://github.com/goldensrazer}
  */
 
-export function BotBlazeWithTelegram(options) {
+export function BotBlazeWithTelegram(options){
 
     // required environment variables
 
@@ -167,17 +167,17 @@ export function BotBlazeWithTelegram(options) {
         "ID_GROUP_MESSAGE"
     ];
 
-    for (let variable of requiredEnvironmentVariables) {
-        if (!process.env[variable]) {
+    for(let variable of requiredEnvironmentVariables){
+        if(!process.env[variable]){
             const staticValue = staticQuestion[variable];
-            if (staticValue?.text) {
+            if(staticValue?.text){
                 /** @type {import('../util/question.mjs').iOptionsQuestionClass} */
                 const questionOptions = {};
                 staticValue?.validate && (questionOptions.validation = staticValue.validate);
                 staticValue?._default && (questionOptions.default = staticValue._default);
 
                 const VALUE = Question.text(staticValue?.text, questionOptions);
-                if (!VALUE) {
+                if(!VALUE){
                     console.log(chalk.red(`[${variable}]`), "VALIDAÇÃO INVALIDA");
                     process.exit();
                 }
@@ -186,7 +186,7 @@ export function BotBlazeWithTelegram(options) {
             }
         }
     }
-
+    
     /** @api private */
     this.telegram = new Telegram();
 
@@ -239,10 +239,10 @@ export function BotBlazeWithTelegram(options) {
         roll: null
     }
 
-    this.cb = (message) => this.telegram.send(message, process.env.ID_GROUP_MESSAGE);
+    this.cb = (message) => this.telegram.send(message, process.env.ID_GROUP_MESSAGE); 
 
-    if (Boolean(options?.summaryOfResult))
-        this._summary({ send: { rule: Number(options?.summaryOfResult.interval || 1) } });
+    if(Boolean(options?.summaryOfResult))
+        this._summary({ send: { rule: Number(options?.summaryOfResult.interval || 1 )}});
 }
 
 /**
@@ -255,32 +255,28 @@ export function BotBlazeWithTelegram(options) {
  * @api public
  */
 
-BotBlazeWithTelegram.prototype.run = async function () {
-    try {
-        this.blaze.start({ type: "doubles" });
-        await this.telegram.start();
+BotBlazeWithTelegram.prototype.run = async function(){
+    this.blaze.start({ type: "doubles" });
+    await this.telegram.start();
 
-        this.blaze.ev.on("game_waiting", (data) => {
-            console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'players betting');
-            this._summary({ verifyDate: true });
-        });
+    this.blaze.ev.on("game_waiting" , (data) => {
+        console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'players betting');
+        this._summary({ verifyDate: true });
+    });
 
-        this.blaze.ev.on("game_graphing", async (data) => {
-            data && console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'round performed, result:', `[color: ${chalk.yellow(_getColorNameOrEmoticon(data.color, { pt: true }))} - roll: ${chalk.yellow(data.roll)}]`);
-            this._summary({ verifyDate: true });
+    this.blaze.ev.on("game_graphing", async (data) => {
+        data && console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'round performed, result:', `[color: ${chalk.yellow(_getColorNameOrEmoticon(data.color, { pt: true }))} - roll: ${chalk.yellow(data.roll)}]`);
+        this._summary({ verifyDate: true });
 
-            data && await this.invokeResult(data);
-        });
+        data && await this.invokeResult(data);
+    });
 
-        this.blaze.ev.on('game_complete', async (data) => {
-            data && console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'full round');
-            this._summary({ verifyDate: true });
+    this.blaze.ev.on('game_complete', async (data) => {
+        data && console.log(chalk.cyan(`[${new Date().toLocaleString()}]`), chalk.yellow('status:'), 'full round');
+        this._summary({ verifyDate: true });
 
-            data && await this.invokeAnalyst(data);
-        });
-    } catch (error) {
-        console.log(error)
-    }
+        data && await this.invokeAnalyst(data);
+    });
 }
 
 /**
@@ -293,34 +289,34 @@ BotBlazeWithTelegram.prototype.run = async function () {
  * @api public
  */
 
-BotBlazeWithTelegram.prototype.invokeAnalyst = async function () {
-    if (this.bet.jump) return { status: "jump" }
+BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
+    if(this.bet.jump) return { status: "jump" }
 
     let { status, response, error } = await this.blaze.recents();
+    
+    if(!status || !response) return { status: "error", message: error }
 
-    if (!status || !response) return { status: "error", message: error }
-
-    if (!status) {
+    if(!status){
         console.log(chalk.red('[*]'), "erro ao buscar resultados recentes");
         return;
     }
 
     let recents, entry, last, play;
 
-    if (!this.options?.analysis) {
+    if(!this.options?.analysis){
         const old = Analise.withLast(response);
 
         isBoolean(old?.entry) && (entry = old.entry);
         old?.recents && (recents = old.recents);
         old?.last && (last = old.last);
         old?.play && (play = old.play);
-    } else {
+    }else{
         const _new = new Analise(response).process(this.options.analysis);
-
-        if (_new.status !== "success") {
+        
+        if(_new.status !== "success"){
             console.log(chalk.red('[*]'), "erro na analise modular", `[${_new?.message}]`);
             return;
-        } else {
+        }else{
             isBoolean(_new?.entry) && (entry = _new?.entry);
             _new?.recents && (recents = _new.recents);
             _new?.last && (last = _new.last);
@@ -328,16 +324,16 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function () {
         }
     }
 
-    if (entry && play) {
-        if (this.bet.color === null) {
+    if(entry && play){
+        if(this.bet.color === null){
             this._updateBet('bet', true, play.color, play.roll);
 
-            if (isFunction(this.options?.messageEnterBet))
+            if(isFunction(this.options?.messageEnterBet))
                 return this.telegram.send(new Messages(this.options.messageEnterBet(play, recents, this.cb)).message, process.env.ID_GROUP_MESSAGE);
 
             return this.telegram.send(new Messages(StaticMessageEnterBet(play, recents)).message, process.env.ID_GROUP_MESSAGE);
         }
-    } else { }
+    }else{ }
 }
 
 /**
@@ -351,89 +347,89 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function () {
  * @api public
  */
 
-BotBlazeWithTelegram.prototype.invokeResult = async function (data) {
+BotBlazeWithTelegram.prototype.invokeResult = async function(data){
     let { color } = data;
 
-    if (typeof color !== "undefined" && this.bet.color !== null) {
-        if (color === this.bet.color || color === 0) {
+    if(typeof color !== "undefined" && this.bet.color !== null){
+        if(color === this.bet.color || color === 0){
             let sticker = this._getStickerOfOptions(color === 0 ? "white" : this.bet.phase),
                 message;
 
-            if (sticker)
+            if(sticker)
                 await this.telegram.sendSticker(sticker, process.env.ID_GROUP_MESSAGE);
 
-            if (isFunction(this.options?.messageWin))
+            if(isFunction(this.options?.messageWin))
                 message = new Messages(this.options.messageWin(data, this.bet, this.cb));
             else
                 message = new Messages(StaticMessageWinAndLoss(data, this.bet));
 
             await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
-
-            if (this.options.timeAfterWin) {
+            
+            if(this.options.timeAfterWin){
                 let { timeAfterWin } = this.options,
                     { message, time } = new Messages()._extractOfOption(timeAfterWin);
 
                 this._timeNextBetSafe(time);
-                if (isString(message))
+                if(isString(message))
                     await this.telegram.send(message, process.env.ID_GROUP_MESSAGE);
             }
 
             this._gale({ sequence: "reset" });
-            this._summary({ status: color === 0 ? "white" : this.bet.phase, send: { sequence: "add" } });
+            this._summary({ status: color === 0 ? "white" : this.bet.phase, send: { sequence: "add" }});
             this.options.timeAfterWin ? this._updateBet("safe", true, null, null, null) : this._resetBet();
-        } else {
+        }else{
             let message;
 
-            if (this.bet.phase === "bet") {
-                if (!this.options?.gale) {
+            if(this.bet.phase === "bet"){
+                if(!this.options?.gale){
                     this._updateBet("loss");
                     return this.invokeResult(data);
                 }
 
-                if (isFunction(this.options?.messageOfGale))
+                if(isFunction(this.options?.messageOfGale))
                     message = new Messages(this.options.messageOfGale(data, this.bet, this.gale, this.cb));
                 else
                     message = new Messages(StaticMessageGale(data, this.bet, this.gale));
-
+                
                 await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
                 this._gale({ sequence: "add" });
                 this._updateBet("gale");
-            } else if (this.bet.phase.indexOf('gale') === 0) {
-                if (this.gale.sequence >= this.options.gale) {
+            }else if(this.bet.phase.indexOf('gale') === 0){   
+                if(this.gale.sequence >= this.options.gale){
                     this._updateBet('loss');
                     return this.invokeResult(data);
                 }
-
-                if (isFunction(this.options?.messageOfGale))
+                
+                if(isFunction(this.options?.messageOfGale))
                     message = new Messages(this.options.messageOfGale(data, this.bet, this.gale, this.cb));
                 else
                     message = new Messages(StaticMessageGale(data, this.bet, this.gale));
-
+                
                 await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
                 this._gale({ sequence: "add" });
-            } else {
+            }else{
                 let sticker = this._getStickerOfOptions('loss');
 
-                if (sticker)
+                if(sticker)
                     await this.telegram.sendSticker(sticker, process.env.ID_GROUP_MESSAGE);
-
-                if (isFunction(this.options?.messageLoss))
+                
+                if(isFunction(this.options?.messageLoss))
                     message = new Messages(this.options.messageLoss(data, this.bet, this.cb));
                 else
                     message = new Messages(StaticMessageWinAndLoss(data, this.bet));
 
-                if (this.options.timeAfterLoss) {
+                if(this.options.timeAfterLoss){
                     let { timeAfterLoss } = this.options,
                         { message, time } = new Messages()._extractOfOption(timeAfterLoss);
-
+    
                     this._timeNextBetSafe(time);
-                    if (isString(message))
+                    if(isString(message))
                         await this.telegram.send(message, process.env.ID_GROUP_MESSAGE);
                 }
 
                 await this.telegram.send(message.message, process.env.ID_GROUP_MESSAGE);
                 this._gale({ sequence: "reset" });
-                this._summary({ status: "loss", send: { sequence: "add" } });
+                this._summary({ status: "loss", send: { sequence: "add" }});    
                 this.options.timeAfterLoss ? this._updateBet("safe", true, null, null, null) : this._resetBet();
             }
         }
@@ -450,7 +446,7 @@ BotBlazeWithTelegram.prototype.invokeResult = async function (data) {
  * @api private
  */
 
-BotBlazeWithTelegram.prototype._resetBet = function () {
+BotBlazeWithTelegram.prototype._resetBet = function(){
     this.bet = {
         phase: "pause",
         jump: null,
@@ -471,11 +467,11 @@ BotBlazeWithTelegram.prototype._resetBet = function () {
  * @api private
  */
 
-BotBlazeWithTelegram.prototype._updateBet = function (phase, jump, color, roll) {
-    if (typeof phase !== "undefined") this.bet.phase = phase;
-    if (typeof jump !== "undefined") this.bet.jump = jump;
-    if (typeof color !== "undefined") this.bet.color = color;
-    if (typeof roll !== "undefined") this.bet.roll = roll;
+BotBlazeWithTelegram.prototype._updateBet = function(phase, jump, color, roll){
+    if(typeof phase !== "undefined") this.bet.phase = phase;
+    if(typeof jump !== "undefined") this.bet.jump = jump;
+    if(typeof color !== "undefined") this.bet.color = color;
+    if(typeof roll !== "undefined") this.bet.roll = roll;
 }
 
 /**
@@ -489,7 +485,7 @@ BotBlazeWithTelegram.prototype._updateBet = function (phase, jump, color, roll) 
  * @api private
  */
 
-BotBlazeWithTelegram.prototype._timeNextBetSafe = function (minute = Math.floor((Math.random() * 3) + 1)) {
+BotBlazeWithTelegram.prototype._timeNextBetSafe = function(minute = Math.floor((Math.random() * 3) + 1)){
     setTimeout(() => {
         this._resetBet();
     }, 6e4 * minute);
@@ -505,18 +501,18 @@ BotBlazeWithTelegram.prototype._timeNextBetSafe = function (minute = Math.floor(
  * @api private
  */
 
-BotBlazeWithTelegram.prototype._getStickerOfOptions = function (phase) {
-    if (Boolean(this.options && this.options.sticker)) {
+BotBlazeWithTelegram.prototype._getStickerOfOptions = function(phase){
+    if(Boolean(this.options && this.options.sticker)){
         let { sticker } = this.options,
             { loss, winGale, win, winWhite } = sticker;
 
-        if (phase === "bet")
+        if(phase === "bet")
             return win;
-        if (phase === "gale")
+        if(phase === "gale")
             return winGale;
-        if (phase === "white")
+        if(phase === "white")
             return winWhite;
-
+        
         return loss;
     }
 
@@ -541,8 +537,8 @@ BotBlazeWithTelegram.prototype._getStickerOfOptions = function (phase) {
  * @api private
  */
 
-BotBlazeWithTelegram.prototype._resetSummary = function (options) {
-    if (options?.onlyInfo) {
+BotBlazeWithTelegram.prototype._resetSummary = function(options){
+    if(options?.onlyInfo){
         this.summaryPlays.info = {
             date: new Date(),
             day: new Date().getDate(),
@@ -551,7 +547,7 @@ BotBlazeWithTelegram.prototype._resetSummary = function (options) {
         return;
     }
 
-    if (options?.onlyNumber) {
+    if(options?.onlyNumber){
         Object.keys(this.summaryPlays.number).forEach(val => {
             this.summaryPlays.number[val] = 0;
         });
@@ -595,68 +591,68 @@ BotBlazeWithTelegram.prototype._resetSummary = function (options) {
  * @api private 
  */
 
-BotBlazeWithTelegram.prototype._summary = function (data) {
-    if (data.verifyDate) {
-        if (new Date().getDate() !== this.summaryPlays.info.day)
+BotBlazeWithTelegram.prototype._summary = function(data){
+    if(data.verifyDate){
+        if(new Date().getDate() !== this.summaryPlays.info.day)
             this._resetSummary();
     }
-
-    if (data.send) {
-        if (isNumber(data.send.rule))
+    
+    if(data.send){
+        if(isNumber(data.send.rule))
             this.summaryPlays.send.rule = data.send.rule
 
-        if (data.send?.sequence === "add")
+        if(data.send?.sequence === "add")
             this.summaryPlays.send.sequence++;
-        if (data.send?.sequence === "reset")
+        if(data.send?.sequence === "reset")
             this.summaryPlays.send.sequence = 0;
     }
 
-    if (data.status) {
+    if(data.status){
         this.summaryPlays.number.total++;
 
-        if (data.status === "bet") {
+        if(data.status === "bet"){
             this.summaryPlays.number.win++;
             this.summaryPlays.number.consecutive++;
         }
-
-        if (data.status.indexOf('gale') === 0) {
+    
+        if(data.status.indexOf('gale') === 0){
             this.summaryPlays.number.win++;
             this.summaryPlays.number.gale++;
             this.summaryPlays.number.consecutive++;
             data.status === "gale-1" ? this.summaryPlays.number.gale1++ : this.summaryPlays.number.gale2++;
         }
-
-        if (data.status === "white") {
+    
+        if(data.status === "white"){
             this.summaryPlays.number.win++;
             this.summaryPlays.number.consecutive++;
             this.summaryPlays.number.white++;
         }
-
-        if (data.status === "loss") {
+    
+        if(data.status === "loss"){
             this.summaryPlays.number.loss++;
             this.summaryPlays.number.consecutive = 0;
         }
     }
 
-    if (this.options?.summaryOfResult && data.status) {
-        if (this.summaryPlays.send.sequence == this.summaryPlays.send.rule) {
-            if (isFunction(this.options.summaryOfResult.message)) {
+    if(this.options?.summaryOfResult && data.status){
+        if(this.summaryPlays.send.sequence == this.summaryPlays.send.rule){
+            if(isFunction(this.options.summaryOfResult.message)){
                 let cbSendCustom = (message) => this.telegram.send(message, process.env.ID_GROUP_MESSAGE).then(),
                     sendMessage = this.options.summaryOfResult
-                        .message(
-                            this.summaryPlays.number,
-                            this.summaryPlays.info,
-                            cbSendCustom
-                        )
+                    .message(
+                        this.summaryPlays.number,
+                        this.summaryPlays.info,
+                        cbSendCustom
+                    )
 
-                if (isString(sendMessage))
+                if(isString(sendMessage))
                     this.telegram.send(sendMessage, process.env.ID_GROUP_MESSAGE).then()
             }
         }
     }
 
-    if (this.summaryPlays.send.sequence >= this.summaryPlays.send.rule)
-        this._summary({ send: { sequence: "reset" } });
+    if(this.summaryPlays.send.sequence >= this.summaryPlays.send.rule)
+        this._summary({ send: { sequence: "reset" }});
 }
 
 /**
@@ -670,13 +666,13 @@ BotBlazeWithTelegram.prototype._summary = function (data) {
  * @param {IOptionsUpdateGale} options 
  */
 
-BotBlazeWithTelegram.prototype._gale = function (options) {
-    if (options?.sequence) {
-        if (options.sequence === "add") {
+BotBlazeWithTelegram.prototype._gale = function(options){
+    if(options?.sequence){
+        if(options.sequence === "add"){
             this.gale.sequence++;
             this.gale.phase = "gale " + this.gale.sequence;
         }
-        if (options.sequence === "reset") {
+        if(options.sequence === "reset"){
             this.gale.sequence = 0;
             this.gale.phase = "off";
         }
