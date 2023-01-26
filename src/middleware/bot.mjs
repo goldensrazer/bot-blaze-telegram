@@ -347,7 +347,7 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
 
 BotBlazeWithTelegram.prototype.invokeResult = async function(data){
     let { color } = data;
-
+    console.log(color, this.bet.color)
     if(typeof color !== "undefined" && this.bet.color !== null){
         console.log(color, this.bet.color)
         if(color === this.bet.color || color === 0){
