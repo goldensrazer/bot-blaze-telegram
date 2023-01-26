@@ -326,8 +326,9 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
         if(this.bet.color === null){
             this._updateBet('bet', true, play.color, play.roll);
 
-            if(isFunction(this.options?.messageEnterBet))
+            if(isFunction(this.options?.messageEnterBet)) {
                 return this.telegram.send(new Messages(this.options.messageEnterBet(play, recents, this.cb)).message, process.env.ID_GROUP_MESSAGE);
+            }
 
             return this.telegram.send(new Messages(StaticMessageEnterBet(play, recents)).message, process.env.ID_GROUP_MESSAGE);
         }
@@ -479,6 +480,7 @@ BotBlazeWithTelegram.prototype._resetBet = function(){
  */
 
 BotBlazeWithTelegram.prototype._updateBet = function(phase, jump, color, roll){
+    console.log(color)
     if(typeof phase !== "undefined") this.bet.phase = phase;
     if(typeof jump !== "undefined") this.bet.jump = jump;
     if(typeof color !== "undefined") this.bet.color = color;
