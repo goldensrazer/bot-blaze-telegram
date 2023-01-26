@@ -49,7 +49,7 @@ async function start(){
                     `\nPROTEJA NO ${_getColorNameOrEmoticon(0, { emoticon: true })} ${_getColorNameOrEmoticon(0, { pt: true, upper: true })}` +
                     `\n\n<pre>https://blaze.com/</pre>` + 
                     `\n\nLink para pré-analise abaixo!` +
-                    `\n<pre>https://goldensrazer.github.io/Blaze_Double_history</pre>` +
+                    `\n<a href="https://goldensrazer.github.io/Blaze_Double_history">Pagina de pré-analise</a>` +
                     `\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`;
             },
             gale: 1,

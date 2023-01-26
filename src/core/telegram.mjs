@@ -259,7 +259,7 @@ Telegram.prototype.sendIn = async function(color, clientId, protection = false, 
         message.push(`PROTEJA NO ${this._getColorNameOrEmoticon(protection, true)} ${this._getColorNameOrEmoticon(protection, false, true)}`);
     message.push(`\n<pre>https://blaze.com/</pre>`);
     message.push(`\n\nLink para pré-analise abaixo!`);
-    message.push(`\n<pre>https://goldensrazer.github.io/Blaze_Double_history</pre>`)
+    message.push(`\n<a href="https://goldensrazer.github.io/Blaze_Double_history">Pagina de pré-analise</a>`)
     message.push(`\n\n<pre>Compartilhe e ganhe cashback de $10 ${process.env.LINK_TO_INVITE}</pre>`);
 
     return await this.send(message.join('\n'), clientId, { parse_mode: "HTML" } );
