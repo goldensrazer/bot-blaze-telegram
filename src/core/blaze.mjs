@@ -132,17 +132,10 @@ BlazeCore.prototype.start = function(){
     });
 
     wss.on('message', (data) => {
+        console.log(data)
         this.onMessage(data, this.ev);
     });
-
-    wss.addEventListener('error', (event) => {
-        console.log('WebSocket error: ', event);
-    });
     
-    wss.on('error', (event) => {
-        console.log('WebSocket error: ', event);
-    });
-
     wss.on('close', (code, reason) => {
         if(code !== 4999){
             setTimeout(() => {
