@@ -321,7 +321,7 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
             _new?.play && (play = _new.play);
         }
     }
-
+    console.log(entry, play)
     if(entry && play){
         if(this.bet.color === null){
             this._updateBet('bet', true, play.color, play.roll);
@@ -350,7 +350,6 @@ BotBlazeWithTelegram.prototype.invokeResult = async function(data){
     let { color } = data;
     console.log(color, this.bet.color)
     if(typeof color !== "undefined" && this.bet.color !== null){
-        console.log(color, this.bet.color)
         if(color === this.bet.color || color === 0){
             let sticker = this._getStickerOfOptions(color === 0 ? "white" : this.bet.phase),
                 message;
@@ -480,7 +479,6 @@ BotBlazeWithTelegram.prototype._resetBet = function(){
  */
 
 BotBlazeWithTelegram.prototype._updateBet = function(phase, jump, color, roll){
-    console.log(color)
     if(typeof phase !== "undefined") this.bet.phase = phase;
     if(typeof jump !== "undefined") this.bet.jump = jump;
     if(typeof color !== "undefined") this.bet.color = color;
