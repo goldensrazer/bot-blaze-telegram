@@ -633,7 +633,9 @@ BotBlazeWithTelegram.prototype._summary = function(data){
             this.summaryPlays.number.consecutive = 0;
         }
     }
-
+    
+    console.log(data)
+    
     if(this.options?.summaryOfResult && data.status){
         if(this.summaryPlays.send.sequence == this.summaryPlays.send.rule){
             if(isFunction(this.options.summaryOfResult.message)){
