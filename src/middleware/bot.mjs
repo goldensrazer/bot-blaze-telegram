@@ -294,12 +294,6 @@ BotBlazeWithTelegram.prototype.invokeAnalyst = async function(){
 
     let { status, response, error } = await this.blaze.recents();
     
-    console.log({
-        status, 
-        response, 
-        error
-    });
-
     if(!status || !response) return { status: "error", message: error }
 
     if(!status){
